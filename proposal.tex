@@ -1,0 +1,333 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+\usepackage[a4paper,left=4cm,right=3cm,top=3cm,bottom=3cm]{geometry}
+\usepackage[indonesian]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=black
+}
+
+\renewcommand{\contentsname}{DAFTAR ISI}
+\renewcommand{\bibname}{DAFTAR PUSTAKA}
+\providecommand{\refname}{DAFTAR PUSTAKA}
+\renewcommand{\refname}{DAFTAR PUSTAKA}
+\addto\captionsindonesian{%
+  \renewcommand{\bibname}{DAFTAR PUSTAKA}%
+  \providecommand{\refname}{DAFTAR PUSTAKA}%
+  \renewcommand{\refname}{DAFTAR PUSTAKA}%
+}
+\renewcommand{\chaptername}{BAB}
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\centering}
+  {BAB \thechapter}
+  {0.5em}
+  {\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{0pt}{2em}
+
+\titleformat{\section}
+  {\normalfont\bfseries}
+  {\thesection}
+  {1em}
+  {}
+\titleformat{\subsection}
+  {\normalfont\bfseries}
+  {\thesubsection}
+  {1em}
+  {}
+
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforechapskip}{2pt}
+\setlength{\cftbeforesecskip}{0pt}
+\setlength{\cftchapnumwidth}{2.8em}
+\setlength{\cftsecnumwidth}{3.2em}
+
+\newcommand{\judul}{PERANCANGAN FRAMEWORK LAPISAN BACKEND FULLY HOMOMORPHIC ENCRYPTION DAN STANDAR PENGEMBANGAN APLIKASI BERBASIS PRIVASI DATA}
+\newcommand{\penulis}{Muhammad Ulinnuha}
+\newcommand{\nim}{23/516588/PA/22101}
+\newcommand{\programstudi}{Elektronika dan Instrumentasi}
+\newcommand{\departemen}{Departemen Ilmu Komputer dan Elektronika}
+\newcommand{\fakultas}{Fakultas Matematika dan Ilmu Pengetahuan Alam}
+\newcommand{\universitas}{Universitas Gadjah Mada}
+\newcommand{\pembimbing}{Muhammad Husni Santriaji, S.Si, M.T., M.S., Ph.D.}
+\newcommand{\tahun}{2026}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{1cm}
+  {\bfseries\large PROPOSAL PENELITIAN\par}
+  \vspace{1cm}
+  {\bfseries\large \judul\par}
+  \vspace{1.2cm}
+  \IfFileExists{logo-ugm.png}{
+    \includegraphics[width=3.8cm,height=3.8cm,keepaspectratio]{logo-ugm.png}\par
+  }{
+    \vspace{3.8cm}\par
+  }
+  \vspace{1.2cm}
+  {\normalsize Disusun Oleh:\par}
+  \vspace{0.4cm}
+  {\bfseries\normalsize \penulis\par}
+  {\normalsize \nim\par}
+  \vfill
+  {\bfseries\normalsize \MakeUppercase{\departemen}\par}
+  {\bfseries\normalsize \MakeUppercase{\fakultas}\par}
+  {\bfseries\normalsize \MakeUppercase{\universitas}\par}
+  {\bfseries\normalsize YOGYAKARTA\par}
+  {\bfseries\normalsize \tahun\par}
+\end{titlepage}
+
+\pagenumbering{roman}
+
+\begingroup
+\singlespacing
+\small
+\tableofcontents
+\endgroup
+\clearpage
+
+\pagenumbering{arabic}
+
+\chapter{PENDAHULUAN}
+
+\section{Latar Belakang}
+
+Komputasi di lingkungan \emph{cloud} dan layanan pihak ketiga telah menjadi fondasi banyak sistem informasi modern. Fleksibilitas, skalabilitas, dan efisiensi biaya mendorong organisasi menempatkan penyimpanan serta pemrosesan data di luar infrastruktur miliknya sendiri \cite{epishkina2025cloudHeArchitecture}. Pada saat yang sama, data yang diproses sering mengandung informasi sensitif. Di bidang kesehatan, misalnya, rekam medis dan hasil analisis klinis menuntut perlindungan kerahasiaan yang ketat \cite{devi2025privacyHealthcareFhe}. Di skenario multi-pihak, nilai pengukuran atau metrik kinerja dapat membocorkan keunggulan metode atau data klien apabila dibuka dalam bentuk plaintext \cite{vinko2026secureByDesign}. Enkripsi konvensional melindungi data saat disimpan atau dikirim, tetapi biasanya mewajibkan dekripsi sebelum komputasi. Begitu plaintext muncul di server pemroses, risiko akses tidak sah dan kebocoran data kembali terbuka \cite{epishkina2025cloudHeArchitecture,vinko2026secureByDesign}.
+
+Fully Homomorphic Encryption (FHE) menawarkan jalur lain. Data dienkripsi di sisi pemilik, dikirim ke server, lalu diolah tetap dalam bentuk ciphertext. Hasil evaluasi juga terenkripsi dan baru dibuka oleh pihak yang memegang kunci privat \cite{fan2026gpuFhe,devi2025privacyHealthcareFhe}. Alur tersebut membuat FHE cocok untuk komputasi di server yang tidak sepenuhnya dipercaya, termasuk layanan \emph{cloud} dan analisis bersama antar lembaga. Dalam literatur, FHE sudah dihubungkan dengan privasi di layanan kesehatan, komputasi statistik rahasia, dan alur kerja yang dirancang agar kerahasiaan dijaga sejak perancangan sistem \cite{devi2025privacyHealthcareFhe,peker2025confidentialStatisticalFhe,vinko2026secureByDesign}.
+
+Persoalan yang diangkat di sini bukan lagi soal apakah FHE mampu menghitung tanpa dekripsi. Kemampuan itu sudah menjadi inti skema FHE. Persoalan yang lebih mendesak bagi rekayasa perangkat lunak adalah bagaimana menempatkan FHE di dalam sistem sehingga pengembang aplikasi tidak terpaksa membangun seluruh infrastruktur kriptografi setiap kali membuat layanan baru. Pada praktiknya, pengembang yang ingin memakai FHE sering harus memilih skema, mengatur parameter keamanan, memahami pertumbuhan \emph{noise}, memperhitungkan kedalaman operasi, mengelola kunci, menyiapkan format ciphertext, dan mengukur biaya evaluasi. Studi kelayakan komputasi statistik dengan TFHE melalui compiler Concrete memperlihatkan betapa cepatnya kompleksitas sirkuit, jumlah \emph{programmable bootstrapping}, waktu kompilasi, dan waktu eksekusi membengkak bahkan untuk ukuran data yang masih kecil \cite{peker2025confidentialStatisticalFhe}. Survei optimasi \emph{bootstrapping} menegaskan bahwa penyegaran \emph{noise} dapat menghabiskan sebagian besar waktu eksekusi FHE \cite{li2026bootstrappingSurvey}. Analisis di GPU menunjukkan bahwa ukuran ciphertext membengkak dan latensi evaluasi masih jauh di atas komputasi plaintext \cite{fan2026gpuFhe}. Beban-beban itu bersifat sistemik. Apabila setiap tim aplikasi harus menyelesaikannya sendiri, pengembangan layanan berbasis privasi menjadi mahal, sulit direplikasi, dan rawan inkonsistensi.
+
+Kebutuhan akan pemisahan tanggung jawab antara pengembang aplikasi dan penyedia infrastruktur sebenarnya sudah familiar di model layanan \emph{cloud}. Pada model \emph{Platform as a Service} (PaaS), pengembang dapat memusatkan perhatian pada pembuatan dan penerapan aplikasi di lingkungan yang sudah distandarkan, tanpa harus mengelola seluruh administrasi infrastruktur dasar \cite{epishkina2025cloudHeArchitecture}. Logika yang sama relevan untuk FHE. Pengembang aplikasi semestinya dapat menulis logika bisnis dan mematuhi kontrak interaksi yang jelas, sementara kerangka sistem di lapisan backend menyiapkan konfigurasi skema, layanan evaluasi homomorfik, pengelolaan kunci sesuai peran, serta batasan operasi yang diizinkan.
+
+Literatur yang ada telah menyiapkan fondasi di beberapa arah. Skema CKKS banyak dibahas untuk komputasi numerik aproksimasi, termasuk integrasinya dengan pembelajaran mesin \cite{wu2025ckksSurvey}. TFHE dan compiler yang menyertainya memberi jalur lain untuk operasi Boolean dan bilangan bulat \cite{peker2025confidentialStatisticalFhe}. Penelitian arsitektur perangkat lunak untuk proteksi data di \emph{cloud} dengan enkripsi homomorfik menguraikan modul klien, penyimpanan atau pemroses di \emph{cloud}, manajemen kunci, algoritma enkripsi dan evaluasi, serta infrastruktur jaringan, lengkap dengan alur pengiriman ciphertext, permintaan operasi, dan pengembalian hasil terenkripsi \cite{epishkina2025cloudHeArchitecture}. Pendekatan \emph{secure-by-design} pada pengujian laboratorium menunjukkan bahwa pembagian peran antara pihak yang memiliki data, pihak yang mengevaluasi, dan pihak yang memegang kunci dapat disusun menjadi alur kerja yang tegas \cite{vinko2026secureByDesign}. Di sisi performa, riset akselerasi GPU, FPGA, dan arsitektur klaster evaluasi homomorfik berusaha menurunkan hambatan rotasi, bandwidth memori, dan bottleneck mikroarsitektur agar FHE lebih layak dijalankan di server \cite{fan2026gpuFhe,xu2026heraFpga,lee2025clusterFhe}.
+
+Meskipun demikian, pembahasan tersebut sering berhenti pada skema kriptografi, kasus aplikasi tertentu, atau akselerasi komputasi. Yang masih kurang adalah kerangka backend generik beserta standar yang mengatur bagaimana aplikasi boleh berinteraksi dengan layanan FHE. Tanpa kerangka dan standar itu, setiap proyek cenderung merakit ulang alur kriptografi, aturan kunci, dan format permintaan dengan caranya sendiri. Pengembang aplikasi pun tetap terdorong masuk ke detail yang semestinya menjadi urusan lapisan sistem.
+
+Penelitian ini mengusulkan perancangan framework lapisan backend FHE beserta standar pengembangan aplikasi yang menyertainya. Framework yang dimaksud adalah rancangan arsitektur layanan di sisi sistem: konfigurasi parameter, layanan evaluasi pada ciphertext, pengelolaan kunci menurut peran, antarmuka layanan, dan pencatatan metrik. Standar yang dimaksud adalah aturan yang wajib diikuti aplikasi ketika memakai backend tersebut, meliputi format permintaan, batasan operasi, larangan mengirim kunci privat ke server evaluasi, dan kewajiban menerima hasil tetap dalam bentuk terenkripsi. Dengan pemisahan ini, pengembang aplikasi diharapkan dapat fokus pada logika aplikasi, sementara kompleksitas FHE dipusatkan di kerangka backend.
+
+Sebagai wujud yang dapat diuji, penelitian akan membangun prototipe konkret bernama layanan evaluasi FHE. Stack yang dipakai adalah pustaka OpenFHE dengan skema CKKS sebagai mesin kriptografi \cite{badawi2022openfhe,brynds2025cryptoracle}, antarmuka REST berbasis FastAPI di Python sebagai pintu masuk backend, serta klien Python tipis yang hanya mengenkripsi masukan, memanggil API, dan mendekripsi keluaran. Beban kerja yang dijalankan bukan fungsi sembarang, melainkan skoring linear terenkripsi $y=\mathbf{w}^{\top}\mathbf{x}+b$ pada vektor fitur berdimensi tetap, dilengkapi operasi penjumlahan dan perkalian skalar sebagai unit verifikasi alur.
+
+\section{Rumusan Masalah}
+
+Berdasarkan latar belakang tersebut, penelitian ini merumuskan masalah tentang bagaimana merancang framework lapisan backend Fully Homomorphic Encryption beserta standar interaksi yang mengatur hubungan antara aplikasi dan backend, sehingga pengembang dapat membangun aplikasi berbasis privasi data tanpa harus menyusun dan mengoperasikan seluruh infrastruktur FHE dari awal. Rumusan tersebut mencakup kebutuhan akan arsitektur layanan yang menempatkan evaluasi homomorfik di sisi sistem, serta kebutuhan akan aturan kepatuhan yang membuat perilaku aplikasi tetap selaras dengan batas keamanan dan kelayakan FHE.
+
+\section{Batasan Masalah}
+
+Penelitian ini dibatasi pada perancangan framework lapisan backend FHE, penyusunan standar interaksi aplikasi--backend, dan implementasi prototipe layanan evaluasi yang dapat dijalankan. Fokus penelitian tidak diarahkan untuk menghasilkan skema kriptografi baru ataupun membuktikan keamanan matematis baru. Akselerasi perangkat keras, komputasi terdistribusi, dan optimasi \emph{bootstrapping} dibahas sebagai konteks beban di lapisan sistem, tetapi bukan objek rekayasa utama. Standar yang disusun bersifat kerangka akademik: kontrak data, pembagian peran, batasan operasi, dan alur validasi. Standar tersebut tidak digarap sebagai spesifikasi industri formal.
+
+Stack implementasi dipatok pada OpenFHE dengan skema CKKS, layanan HTTP REST menggunakan FastAPI, dan klien contoh dalam Python. Operasi yang didukung backend dibatasi pada himpunan tetap: penjumlahan dua ciphertext, perkalian ciphertext dengan vektor plaintext (bobot), dan evaluasi skoring linear $y=\mathbf{w}^{\top}\mathbf{x}+b$ untuk vektor fitur berdimensi $d\in\{8,16\}$. Bootstrapping tidak dijalankan pada prototipe; kedalaman multiplikasi disesuaikan agar skoring linear dapat dievaluasi dalam satu putaran tanpa penyegaran \emph{noise}. Evaluasi mencatat kepatuhan terhadap standar, galat relatif terhadap baseline plaintext, ukuran ciphertext, serta waktu enkripsi, evaluasi, dan dekripsi.
+
+\section{Tujuan Penelitian}
+
+Penelitian ini bertujuan merancang framework lapisan backend FHE yang menempatkan konfigurasi skema, evaluasi homomorfik, pengelolaan kunci menurut peran, dan antarmuka layanan di dalam kerangka sistem. Penelitian ini juga bertujuan merumuskan standar pengembangan aplikasi yang mengatur cara aplikasi berinteraksi dengan backend tersebut, mencakup format permintaan REST, batasan operasi, aturan penanganan kunci, dan kewajiban menjaga data tetap terenkripsi selama berada di server evaluasi. Tujuan implementatifnya adalah membangun prototipe layanan evaluasi berbasis OpenFHE--CKKS yang diekspos melalui FastAPI, dilengkapi klien tipis dan skenario skoring linear terenkripsi, lalu mengukur kebenaran hasil serta biaya dasar eksekusi.
+
+\section{Sistematika Penulisan}
+
+Dalam penulisan laporan ini, susunan pembahasan mengikuti sistematika berikut:
+
+\begin{enumerate}[label=\textbf{BAB \Roman* :}, leftmargin=2.6cm]
+  \item \textbf{PENDAHULUAN}\\
+  Bagian awal laporan memaparkan alasan penelitian dilakukan, masalah yang ingin dijawab, batasan pembahasan, tujuan yang hendak dicapai, manfaat penelitian, dan susunan penulisan.
+
+  \item \textbf{TINJAUAN PUSTAKA}\\
+  Pembahasan diarahkan pada permasalahan penyediaan FHE bagi pengembang aplikasi, solusi yang telah ada, gap penelitian, landasan teori yang relevan, dan posisi rancangan backend yang diusulkan.
+
+  \item \textbf{METODOLOGI PENELITIAN}\\
+  Pada bagian ini dijelaskan tahapan penelitian, rancangan framework backend, perumusan standar interaksi aplikasi, skenario pengujian, metrik evaluasi, dan metode analisis.
+
+  \item \textbf{RENCANA PENELITIAN}\\
+  Bagian akhir proposal menjelaskan prototipe \texttt{fhe-eval}, status implementasi, alur kerja, bentuk hasil yang akan dianalisis, keterbatasan, serta arah pengembangan. Lampiran A merangkum standar interaksi aplikasi--backend.
+\end{enumerate}
+
+\chapter{TINJAUAN PUSTAKA}
+
+\section{Permasalahan Penyediaan FHE bagi Pengembang Aplikasi}
+
+FHE memungkinkan komputasi pada data terenkripsi, tetapi kemampuan itu tidak otomatis membuat FHE mudah dipakai di dalam produk perangkat lunak. Pada aplikasi biasa, pengembang menulis fungsi, mengirim data ke server, memprosesnya, lalu mengembalikan hasil. Pada FHE, data tidak boleh dibuka selama berada di lingkungan evaluasi. Setiap keputusan tentang tipe data, kedalaman operasi, dan bentuk fungsi memengaruhi apakah komputasi masih dapat dijalankan secara homomorfik \cite{vinko2026secureByDesign,wu2025ckksSurvey}. Ciphertext membawa parameter, \emph{noise}, dan batasan operasi. Fungsi yang tampak ringan pada plaintext dapat menjadi mahal atau tidak layak setelah diterjemahkan ke sirkuit FHE \cite{peker2025confidentialStatisticalFhe}.
+
+Beban teknis tersebut muncul di banyak lapisan sekaligus. Pemilihan skema menentukan jenis aritmetika yang didukung. CKKS cocok untuk komputasi numerik aproksimasi, sementara TFHE lebih dekat dengan operasi Boolean dan bilangan bulat \cite{wu2025ckksSurvey,peker2025confidentialStatisticalFhe}. Pertumbuhan \emph{noise} membatasi kedalaman evaluasi; \emph{bootstrapping} diperlukan untuk menyegarkan ciphertext, tetapi proses itu sering menjadi sumber biaya dominan \cite{li2026bootstrappingSurvey}. Ukuran ciphertext juga membengkak dibandingkan plaintext, sehingga bandwidth, memori, dan latensi menjadi perhatian serius pada server evaluasi \cite{fan2026gpuFhe}. Ketika pengembang aplikasi harus mengurus seluruh rantai itu, pekerjaan membangun fitur bisnis tumpang tindih dengan pekerjaan membangun infrastruktur kriptografi.
+
+Di lingkungan \emph{cloud}, risiko keamanan memperparah kebutuhan akan desain sistem yang tegas. Ancaman kebocoran data, akses tidak sah melalui antarmuka yang lemah, dan manipulasi selama penyimpanan atau pemrosesan menuntut agar data sensitif tidak diolah dalam bentuk plaintext di server pihak ketiga \cite{epishkina2025cloudHeArchitecture}. FHE menjawab kebutuhan itu secara kriptografis, tetapi tanpa kerangka backend yang terstandar, setiap tim aplikasi cenderung merancang ulang alur kunci, format payload, dan aturan evaluasi. Hasilnya adalah implementasi yang sulit dibandingkan, sulit diaudit, dan sulit diwariskan ke pengembang lain.
+
+\section{Solusi yang Telah Ada}
+
+Pada lapisan skema dan perangkat pengembang kriptografi, CKKS banyak dikaji untuk komputasi aproksimasi pada bilangan real atau kompleks, termasuk skenario pembelajaran mesin yang masih dapat menerima galat kecil \cite{wu2025ckksSurvey}. TFHE, melalui compiler seperti Concrete, memperlihatkan jalur dari program level tinggi ke komputasi homomorfik, sekaligus mengungkap batasan praktis terkait ukuran data, kompleksitas sirkuit, dan waktu eksekusi \cite{peker2025confidentialStatisticalFhe}. Kedua jalur itu memperkaya kemampuan FHE, tetapi masih meninggalkan pertanyaan tentang di mana detail skema seharusnya disembunyikan dari pengembang aplikasi dan di mana detail itu harus tetap dikendalikan oleh sistem.
+
+Pada lapisan pustaka FHE, OpenFHE menyediakan implementasi skema-skema utama (termasuk CKKS) dalam satu API, dengan mode yang ramah pengguna maupun mode yang lebih terbuka bagi pengendali eksternal, serta abstraksi perangkat keras melalui \emph{Hardware Abstraction Layer} \cite{badawi2022openfhe}. Karakterisasi OpenFHE pada skema CKKS menunjukkan bahwa biaya dan perilaku performa sangat bergantung pada parameter dan tingkat abstraksi workload yang dijalankan, sehingga konfigurasi sepatutnya dikelola secara terpusat di sisi sistem, bukan diulang di setiap aplikasi \cite{brynds2025cryptoracle}. Di ekosistem Python, pustaka seperti TenSEAL membungkus operasi tensor terenkripsi di atas mesin SEAL dan memudahkan eksperimen di level aplikasi \cite{benaissa2021tenseal}. Penelitian ini tidak membangun pustaka FHE baru; OpenFHE dipakai sebagai mesin evaluasi di backend, sementara kontribusi terletak pada kerangka layanan dan standar pemakaiannya.
+
+Pada lapisan arsitektur perangkat lunak, penelitian tentang enkripsi homomorfik untuk proteksi data di \emph{cloud} menguraikan tujuan dan persyaratan perangkat lunak, lalu memecah sistem menjadi aplikasi klien, penyimpanan atau pemroses di \emph{cloud}, modul manajemen kunci, algoritma enkripsi dan pemrosesan data, serta infrastruktur jaringan \cite{epishkina2025cloudHeArchitecture}. Aplikasi klien mengirim data terenkripsi dan dapat meminta operasi aritmetika pada ciphertext. Komponen di \emph{cloud} menerima ciphertext, menjalankan operasi tanpa dekripsi, dan mengembalikan hasil terenkripsi. Modul kunci menangani generasi, penyimpanan, dan distribusi kunci sesuai kebutuhan skema. Arsitektur itu menunjukkan bahwa FHE dapat diposisikan sebagai sistem layanan dengan batas tanggung jawab antar komponen, bukan sekadar pemanggilan pustaka di dalam kode aplikasi.
+
+Pendekatan \emph{secure-by-design} pada pengujian kompetensi laboratorium memberi contoh alur multi-pihak yang lebih ketat. Penyelenggara menyediakan nilai acuan terenkripsi dan material kunci yang relevan; peserta mengenkripsi data pengukuran di sisi lokal, mengevaluasi metrik pada ciphertext, lalu mengembalikan hanya metrik terenkripsi; dekripsi hasil akhir dilakukan tanpa mengharuskan penyelenggara menerima plaintext pengukuran mentah peserta \cite{vinko2026secureByDesign}. Alur tersebut menegaskan pentingnya pemisahan peran dan larangan membuka data di titik yang tidak berwenang.
+
+Pada lapisan performa, berbagai penelitian menempatkan bottleneck FHE di domain sistem dan perangkat keras. Survei \emph{bootstrapping} memetakan optimasi untuk skema word-wise, bit-wise, dan hibrida, serta menekankan porsi waktu yang dihabiskan proses penyegaran \emph{noise} \cite{li2026bootstrappingSurvey}. Analisis FHE di GPU mengidentifikasi hambatan mikroarsitektur yang menurunkan utilisasi perangkat keras \cite{fan2026gpuFhe}. Akselerator FPGA dan arsitektur klaster evaluasi homomorfik menargetkan operasi mahal seperti rotasi dan transformasi terkait bootstrapping \cite{xu2026heraFpga,lee2025clusterFhe}. Temuan-temuan itu memperkuat argumen bahwa urusan performa dan eksekusi evaluasi wajar digarap di lapisan backend sistem, bukan dibebankan berulang-ulang kepada setiap pengembang fitur aplikasi.
+
+\section{Gap dan Posisi Penelitian}
+
+Solusi yang tersedia sudah memperkuat fondasi FHE di ranah skema, kasus terapan, arsitektur \emph{cloud}, dan akselerasi. Namun, kebutuhan pengembang aplikasi yang ingin memakai FHE tanpa membangun infrastruktur dari nol masih belum terjawab secara utuh. Compiler membantu penerjemahan sebagian fungsi. Arsitektur \emph{cloud} memberi contoh modul. Akselerator mempercepat potongan eksekusi. Yang masih jarang diformulasikan sebagai objek perancangan tersendiri adalah framework backend generik yang mengekspos layanan evaluasi, ditambah standar yang menjelaskan kewajiban aplikasi ketika memakai layanan itu.
+
+Tanpa standar, antarmuka backend mudah digelincirkan menjadi sekumpulan pemanggilan teknis yang tetap memaksa pengembang memahami parameter FHE secara mendalam. Sebaliknya, tanpa backend yang disiplin, standar tertulis sulit ditegakkan karena tidak ada titik penegakan di sistem. Penelitian ini memandang keduanya sebagai satu paket rancangan. Framework backend menyediakan tempat konfigurasi, evaluasi, pengelolaan kunci menurut peran, dan pengukuran. Standar menyediakan aturan main bagi aplikasi: data masuk dan keluar dalam bentuk yang diizinkan, operasi dibatasi pada himpunan yang didukung parameter aktif, kunci privat tidak pernah diserahkan ke server evaluasi, dan hasil tetap terenkripsi hingga tiba di pihak berwenang.
+
+Kontribusi yang diusulkan bukan skema kriptografi baru dan bukan akselerator baru. Kontribusi berada pada perancangan kerangka sistem backend FHE dan standar pengembangan aplikasi yang menyertainya, agar pengembang dapat memusatkan kerja pada logika aplikasi sementara infrastruktur FHE disiapkan dan dikendalikan di lapisan backend.
+
+\section{Landasan Teori}
+
+Fully Homomorphic Encryption adalah bentuk enkripsi yang memungkinkan operasi dijalankan langsung pada ciphertext dan menghasilkan ciphertext baru yang, setelah didekripsi oleh pemegang kunci yang sah, bersesuaian dengan hasil operasi pada plaintext \cite{devi2025privacyHealthcareFhe,epishkina2025cloudHeArchitecture}. Berbeda dengan enkripsi biasa yang menuntut dekripsi sebelum data diolah, FHE menjaga data tetap tersembunyi selama pemrosesan di server. Sifat itu membuat FHE relevan untuk komputasi di infrastruktur yang tidak sepenuhnya dipercaya.
+
+Dalam pelaksanaan, setiap operasi homomorfik menambah biaya komputasi dan biasanya menambah \emph{noise} pada ciphertext. Apabila \emph{noise} melampaui ambang tertentu, dekripsi gagal atau menghasilkan nilai yang salah. \emph{Bootstrapping} menyegarkan ciphertext agar evaluasi dapat dilanjutkan, tetapi proses itu sering menjadi bagian paling mahal dalam eksekusi FHE \cite{li2026bootstrappingSurvey}. Pemahaman terhadap kedalaman komputasi dan biaya penyegaran \emph{noise} menjadi dasar mengapa konfigurasi parameter dan kebijakan operasi seharusnya dikelola di backend, bukan ditetapkan ad hoc di setiap aplikasi.
+
+CKKS mendukung aritmetika aproksimasi pada data numerik dan banyak dipakai ketika galat kecil masih dapat diterima, misalnya pada sejumlah skenario analisis dan pembelajaran mesin \cite{wu2025ckksSurvey,vinko2026secureByDesign}. TFHE menempuh jalur berbeda dengan penekanan pada operasi Boolean dan bilangan bulat, serta \emph{programmable bootstrapping} untuk fungsi yang lebih kaya pada level bit \cite{peker2025confidentialStatisticalFhe}. Pemilihan skema memengaruhi bentuk data yang dapat diproses dan jenis operasi yang wajar disediakan backend.
+
+Framework lapisan backend dalam penelitian ini dipahami sebagai kerangka layanan sistem yang berdiri di antara aplikasi dan mesin kriptografi FHE. Backend menyiapkan parameter skema, mengekspos antarmuka permintaan evaluasi, menjalankan operasi pada ciphertext, mengelola material kunci sesuai peran, dan mencatat metrik layanan. Aplikasi di sisi klien tetap bertanggung jawab atas logika bisnis, enkripsi input di pihak yang berwenang, serta dekripsi hasil akhir, tetapi tidak menyusun ulang infrastruktur evaluasi.
+
+Standar pengembangan aplikasi dipahami sebagai seperangkat aturan kepatuhan yang mengikat cara aplikasi memakai backend. Aturan itu mencakup format payload, metadata operasi yang wajib disertakan, batasan jenis operasi, larangan mengirim kunci privat ke server evaluasi, dan kewajiban menerima keluaran tetap terenkripsi. Standar berfungsi sebagai kontrak antara pengembang aplikasi dan penyedia kerangka backend.
+
+Evaluasi rancangan tidak cukup melihat apakah program berjalan. Kebenaran alur diuji dengan membandingkan hasil dekripsi terhadap baseline plaintext, dengan toleransi yang wajar apabila skema bersifat aproksimasi \cite{vinko2026secureByDesign}. Metrik performa dasar meliputi waktu enkripsi di sisi berwenang, waktu evaluasi di backend, waktu dekripsi, dan ukuran ciphertext. Metrik tersebut dibaca sebagai gambaran biaya layanan, sejalan dengan cara literatur memosisikan overhead FHE sebagai tantangan sistem \cite{li2026bootstrappingSurvey,fan2026gpuFhe,lee2025clusterFhe}.
+
+\chapter{METODOLOGI PENELITIAN}
+
+\section{Tahapan Penelitian}
+
+Penelitian berlangsung melalui tahapan yang berurutan. Tahap pertama adalah studi literatur tentang FHE, arsitektur proteksi data di \emph{cloud}, alur multi-pihak, karakteristik OpenFHE/CKKS, serta tantangan performa evaluasi homomorfik. Tahap kedua adalah analisis kebutuhan framework backend dan standar interaksi, dengan memetakan tanggung jawab yang wajib berada di sistem (parameter, evaluasi, penegakan whitelist operasi) dan yang tetap di klien (enkripsi masukan, dekripsi hasil, logika bisnis). Tahap ketiga adalah perancangan arsitektur layanan dan kontrak REST. Tahap keempat adalah implementasi prototipe pada stack yang sudah ditetapkan. Tahap kelima adalah pengujian skoring linear terenkripsi beserta kasus penolakan standar, lalu analisis kebenaran, kepatuhan, dan biaya.
+
+\section{Stack dan Artefak Prototipe}
+
+Prototipe yang dibangun memiliki sasaran yang tegas: sebuah layanan evaluasi FHE yang dapat dipanggil aplikasi melalui HTTP, tanpa mengharuskan pengembang aplikasi menulis kode OpenFHE di sisi server. Stack dipilih agar dapat direplikasi dan dirujuk ke literatur pustaka FHE.
+
+Mesin kriptografi memakai OpenFHE pada skema CKKS. OpenFHE dipilih karena menyediakan API terpadu untuk skema-skema FHE utama, mendukung mode pengelolaan parameter yang terpusat, dan telah dikarakterisasi secara mendalam untuk workload CKKS \cite{badawi2022openfhe,brynds2025cryptoracle}. CKKS dipilih karena sesuai untuk vektor numerik aproksimasi pada skoring linear dan sejalan dengan penggunaan skema numerik pada studi alur \emph{secure-by-design} maupun survei PPML \cite{vinko2026secureByDesign,wu2025ckksSurvey}. Lapisan layanan memakai FastAPI pada Python untuk mengekspos endpoint REST, mem-parse permintaan, memanggil wrapper OpenFHE di proses backend, dan mengembalikan respons JSON. Serialisasi ciphertext memakai format biner bawaan OpenFHE yang dikodekan Base64 di dalam body JSON agar dapat melewati HTTP tanpa mengorbankan struktur ciphertext. Klien contoh ditulis dalam Python: menghasilkan kunci, mengenkripsi vektor fitur, mengirim permintaan, menerima ciphertext hasil, dan mendekripsi. Sebagai rujukan ekosistem Python terkait, TenSEAL menunjukkan pola operasi tensor terenkripsi di atas mesin HE, tetapi dalam penelitian ini TenSEAL tidak menjadi backend utama; yang dipakai adalah OpenFHE yang dibungkus layanan \cite{benaissa2021tenseal}.
+
+Artefak yang akan dihasilkan terdiri atas empat bagian. Pertama, repositori layanan backend (\texttt{fhe-eval-backend}) yang memuat inisialisasi \emph{crypto context} CKKS, whitelist operasi, endpoint REST, dan pencatat metrik. Kedua, klien tipis (\texttt{fhe-eval-client}) yang mematuhi standar pemanggilan. Ketiga, dokumen standar interaksi yang merinci skema payload, kode operasi, dan aturan kunci. Keempat, skrip uji yang menjalankan baseline plaintext, alur terenkripsi, dan kasus penolakan.
+
+Konfigurasi CKKS pada prototipe direncanakan dengan tingkat keamanan sekitar 128 bit, derajat polinomial $N=2^{13}$ atau $N=2^{14}$ (dipilih setelah uji kelayakan memori pada mesin pengembangan), dan kedalaman multiplikasi yang cukup untuk satu putaran perkalian elemen-wise diikuti penjumlahan, tanpa bootstrapping. Parameter final akan dicatat apa adanya pada laporan agar eksperimen dapat diulang.
+
+\section{Rancangan Framework Backend}
+
+Framework backend diposisikan sebagai kerangka sistem di atas OpenFHE. Aplikasi tidak memanggil API C++ OpenFHE secara langsung di server aplikasi. Aplikasi hanya berkomunikasi lewat kontrak REST yang disediakan layanan. Pola klien mengirim ciphertext, server mengevaluasi tanpa dekripsi, dan hasil dikembalikan terenkripsi mengikuti arsitektur proteksi data di \emph{cloud} \cite{epishkina2025cloudHeArchitecture}.
+
+Komponen backend dirinci sebagai berikut. \emph{Context manager} membuat dan menyimpan \emph{crypto context} CKKS bersama pengenal versi konteks (\texttt{context\_id}). \emph{Key material store} di sisi server hanya menampung material yang sah untuk evaluasi, misalnya \emph{evaluation key} atau \emph{relinearization key} yang diperlukan skema, dan tidak menyimpan secret key klien \cite{epishkina2025cloudHeArchitecture,vinko2026secureByDesign}. \emph{Operation registry} memetakan nama operasi ke implementasi OpenFHE yang diizinkan. \emph{Request validator} menolak payload yang tidak cocok dengan standar sebelum ciphertext disentuh mesin FHE. \emph{Eval engine} mengeksekusi operasi homomorfik. \emph{Metrics logger} mencatat latensi evaluasi, ukuran payload masuk/keluar, status HTTP, dan alasan penolakan bila ada.
+
+Endpoint yang direncanakan bersifat eksplisit. \texttt{GET /v1/context} mengembalikan \texttt{context\_id}, ringkasan parameter publik, dan daftar operasi yang diizinkan. \texttt{POST /v1/eval/add} menerima dua ciphertext vektor dan mengembalikan ciphertext hasil penjumlahan. \texttt{POST /v1/eval/mul\_plain} menerima satu ciphertext dan satu vektor plaintext bobot, lalu mengembalikan hasil perkalian elemen-wise. \texttt{POST /v1/eval/linear\_score} menerima ciphertext vektor fitur $\mathbf{x}$ serta bobot $\mathbf{w}$ dan bias $b$ dalam bentuk yang diizinkan standar, lalu mengembalikan ciphertext skalar (atau vektor slot hasil) untuk $y=\mathbf{w}^{\top}\mathbf{x}+b$. \texttt{GET /v1/metrics/last} mengembalikan metrik eksekusi terakhir untuk keperluan pengujian. Tidak ada endpoint dekripsi di backend.
+
+\section{Standar Interaksi Aplikasi dan Backend}
+
+Standar ditulis agar pengembang aplikasi memiliki kontrak yang dapat diikuti tanpa membuka detail internal OpenFHE. Setiap permintaan evaluasi wajib memuat \texttt{context\_id} yang sama dengan konteks aktif backend. Body permintaan memuat ciphertext dalam Base64, dimensi vektor $d$, dan kode operasi. Secret key dilarang dikirim ke backend. Backend dilarang mengembalikan plaintext hasil. Operasi di luar whitelist ditolak dengan kode HTTP 400 dan pesan kesalahan generik yang tidak membocorkan isi data.
+
+Untuk \texttt{linear\_score}, standar menetapkan bahwa $\mathbf{w}$ dan $b$ diperlakukan sebagai plaintext publik model pada prototipe ini (bukan data rahasia klien), sementara $\mathbf{x}$ adalah data sensitif yang dienkripsi klien. Pemilihan itu disengaja agar skenario dekat dengan inferensi model sederhana di server yang tidak dipercaya penuh, sejalan dengan motivasi PPML pada data numerik \cite{wu2025ckksSurvey}. Dimensi $d$ harus sama dengan konfigurasi packing yang disepakati; ketidaksesuaian dimensi ditolak validator.
+
+Klien yang patuh standar hanya perlu: (1) mengambil deskripsi konteks publik, (2) mengenkripsi $\mathbf{x}$, (3) memanggil endpoint operasi, (4) mendekripsi hasil. Pengaturan modulus, scaling factor, dan pemanggilan primitif OpenFHE di server bukan urusan pengembang aplikasi.
+
+\section{Skenario Pengujian}
+
+Skenario utama adalah skoring linear terenkripsi. Dibangkitkan $N_{\text{uji}}$ vektor fitur acak berdimensi $d=8$ dan $d=16$, bersama vektor bobot dan bias tetap. Untuk setiap sampel dihitung baseline plaintext $y=\mathbf{w}^{\top}\mathbf{x}+b$. Sampel yang sama dienkripsi di klien, dikirim ke \texttt{/v1/eval/linear\_score}, didekripsi di klien, lalu dibandingkan dengan baseline. Galat relatif dan galat mutlak dicatat. Ambang keberhasilan awal merujuk pada praktik evaluasi CKKS pada komputasi numerik yang menuntut galat jauh di bawah ambang keputusan aplikasi; pada prototipe ini target operasional adalah galat relatif di bawah $10^{-3}$ untuk parameter yang dipilih, dengan catatan akhir disesuaikan hasil ukur \cite{vinko2026secureByDesign}.
+
+Skenario unit mencakup \texttt{add} dan \texttt{mul\_plain} untuk memverifikasi bahwa registry operasi dan serialisasi ciphertext bekerja sebelum skoring linear diuji. Skenario negatif mencakup secret key yang disisipkan di body, \texttt{context\_id} yang salah, dimensi yang tidak cocok, dan nama operasi di luar whitelist. Backend harus menolak keempat kasus itu.
+
+Metrik yang dicatat per uji: waktu enkripsi klien, waktu evaluasi backend, waktu dekripsi klien, ukuran ciphertext permintaan, ukuran ciphertext respons, dan status kepatuhan. Pengukuran diulang beberapa kali pada mesin yang sama agar variasi run-to-run dapat diamati, mengikuti semangat pelaporan kelayakan pada studi FHE terapan \cite{vinko2026secureByDesign,brynds2025cryptoracle}.
+
+\section{Metode Analisis}
+
+Analisis kebenaran membandingkan $y$ hasil dekripsi terhadap baseline plaintext dan merangkum galat. Analisis kepatuhan memeriksa log penolakan pada skenario negatif serta memastikan tidak ada jalur dekripsi di server. Analisis biaya membaca latensi dan ukuran ciphertext untuk menjelaskan overhead layanan, tanpa klaim bahwa prototipe lebih cepat daripada sistem lain. Kelayakan framework dinilai dari apakah klien tipis dapat menyelesaikan skoring linear hanya dengan kontrak REST, sementara seluruh pemanggilan OpenFHE berada di backend. Temuan bottleneck dibahas dengan merujuk karakteristik CKKS/OpenFHE dan overhead FHE pada literatur sistem \cite{brynds2025cryptoracle,li2026bootstrappingSurvey,fan2026gpuFhe}.
+
+\chapter{RENCANA PENELITIAN}
+
+\section{Prototipe \texttt{fhe-eval}}
+
+Bukti rancangan diwujudkan sebagai repositori prototipe bernama \texttt{fhe-eval} yang berada dalam folder kerja penelitian. Prototipe ini bukan sekadar kerangka kosong: di dalamnya terdapat layanan evaluasi FHE, klien tipis, penegakan standar, skrip demo, dan rangkaian uji otomatis. Struktur utamanya adalah sebagai berikut.
+
+\begin{itemize}
+  \item \texttt{src/fhe\_eval/}: inti backend, meliputi profil parameter CKKS (\texttt{config.py}), mesin evaluasi (\texttt{engine.py}), penegakan standar (\texttt{standards.py}), model permintaan/respons (\texttt{schemas.py}), pencatat metrik (\texttt{metrics.py}), dan antarmuka FastAPI (\texttt{api/}).
+  \item \texttt{client/}: klien Python tipis (\texttt{fhe\_client.py}) dan demo skoring linear (\texttt{demo\_linear\_score.py}).
+  \item \texttt{tests/}: uji unit mesin FHE, uji API, dan uji penolakan standar.
+  \item \texttt{STANDARDS.md}: kontrak interaksi aplikasi--backend yang diringkas juga pada Lampiran A proposal ini.
+  \item \texttt{README.md} dan \texttt{requirements.txt}: petunjuk instalasi dan dependensi.
+\end{itemize}
+
+Stack yang berjalan pada prototipe saat ini memakai skema CKKS melalui pustaka TenSEAL (Microsoft SEAL) di balik layanan FastAPI \cite{benaissa2021tenseal,vinko2026secureByDesign}. Pilihan ini diambil agar mesin kriptografi dapat diinstal dan diuji pada lingkungan pengembangan, sementara kontrak REST tetap selaras dengan rancangan backend. Adapter evaluasi dipisahkan di \texttt{engine.py} agar di kemudian hari dapat diganti ke OpenFHE tanpa mengubah endpoint yang dilihat pengembang aplikasi \cite{badawi2022openfhe,brynds2025cryptoracle}. Profil parameter aktif prototipe diberi pengenal \texttt{ckks-n8192-s40-d8-16} (derajat polinomial $8192$, skala $2^{40}$, dimensi vektor $8$ dan $16$).
+
+\section{Rencana Implementasi dan Status}
+
+Implementasi disusun dalam tonggak yang dapat diperiksa, dan sebagian telah terisi oleh prototipe \texttt{fhe-eval}.
+
+Tonggak pertama adalah mesin evaluasi CKKS yang mampu membuat konteks, menghasilkan kunci di sisi klien, mengenkripsi vektor, menjalankan penjumlahan, perkalian dengan bobot plaintext, skoring linear, serta men-serialisasi ciphertext. Pada \texttt{fhe-eval}, tonggak ini diwujudkan di \texttt{engine.py} dan diverifikasi oleh \texttt{tests/test\_engine.py}.
+
+Tonggak kedua adalah layanan FastAPI dengan endpoint konteks, pengikatan public context, evaluasi, dan metrik, dilengkapi validator standar. Endpoint yang disediakan meliputi \texttt{GET /v1/context}, \texttt{POST /v1/context/bind}, \texttt{POST /v1/eval/add}, \texttt{POST /v1/eval/mul\_plain}, \texttt{POST /v1/eval/linear\_score}, dan \texttt{GET /v1/metrics/last}. Uji API tersedia di \texttt{tests/test\_api.py}.
+
+Tonggak ketiga adalah klien tipis dan skrip demo untuk skoring linear pada $d=8$ dan $d=16$, dengan pembandingan terhadap baseline plaintext. Target operasional galat relatif di bawah $10^{-3}$ dipakai sebagai ambang awal kelayakan numerik CKKS.
+
+Tonggak keempat adalah dokumentasi standar interaksi. Isi kontrak ditulis di \texttt{fhe-eval/STANDARDS.md} dan diringkas pada Lampiran A. Pengujian penegakan standar (penolakan secret key, operasi ilegal, dan sejenisnya) ada di \texttt{tests/test\_standards.py} serta skenario negatif API.
+
+Pekerjaan lanjutan skripsi mencakup perluasan himpunan operasi, pengaitan adapter OpenFHE apabila lingkungan build sudah siap, penempatan layanan pada skenario \emph{cloud} yang lebih realistis, serta pelaporan metrik yang lebih sistematis pada bab hasil.
+
+\section{Komponen dan Alur Kerja Prototipe}
+
+Komponen yang dijalankan pada \texttt{fhe-eval} mencerminkan pemisahan peran. Klien memiliki secret key, mengenkripsi masukan, dan mendekripsi keluaran. Backend hanya menyimpan public context setelah \texttt{/v1/context/bind}, menolak payload yang melanggar standar, menjalankan evaluasi pada ciphertext, dan mengembalikan ciphertext hasil. Backend tidak menyediakan endpoint dekripsi.
+
+Alur skoring linear berjalan sebagai berikut. Klien memanggil \texttt{GET /v1/context} untuk memastikan profil parameter. Klien membuat context CKKS lokal, lalu mengirim public context (tanpa secret key) melalui \texttt{POST /v1/context/bind}. Klien mengenkripsi vektor fitur $\mathbf{x}$ dan mengirim \texttt{POST /v1/eval/linear\_score} bersama bobot $\mathbf{w}$, bias $b$, dimensi $d$, dan \texttt{context\_id}. Backend memvalidasi permintaan, menghitung $y=\mathbf{w}^{\top}\mathbf{x}+b$ secara homomorfik, dan mengembalikan ciphertext $y$. Klien mendekripsi $y$ dan membandingkannya dengan baseline plaintext. Sepanjang evaluasi di server, plaintext $\mathbf{x}$ tidak direkonstruksi.
+
+\section{Rencana Hasil dan Pembahasan}
+
+Hasil yang disajikan meliputi uraian arsitektur \texttt{fhe-eval}, spesifikasi endpoint dan payload, ringkasan kontrak pada Lampiran A, tabel galat skoring linear, tabel latensi evaluasi, serta rekap penolakan standar. Pembahasan menilai apakah pemisahan tanggung jawab tercapai: pengembang yang memakai klien tipis tidak menulis konfigurasi mesin FHE di server aplikasi, sementara backend menegakkan whitelist dan menjaga ciphertext tetap tertutup. Angka latensi dan ukuran ciphertext dibaca sebagai biaya layanan pada stack yang dipilih, lalu dikaitkan dengan temuan karakterisasi CKKS dan overhead FHE di literatur \cite{brynds2025cryptoracle,fan2026gpuFhe,li2026bootstrappingSurvey,lee2025clusterFhe}.
+
+\section{Keterbatasan dan Arah Pengembangan}
+
+Prototipe \texttt{fhe-eval} dibatasi pada skema CKKS, himpunan operasi kecil, dan skoring linear berdimensi rendah tanpa bootstrapping. Mesin yang terpasang saat ini adalah TenSEAL; integrasi OpenFHE sebagai adapter alternatif masih menjadi pekerjaan lanjutan. Hasil tidak digeneralisasi ke jaringan dalam, operasi perbandingan, atau multi-tenant produksi. Standar masih berupa kontrak akademik REST, belum mencakup autentikasi layanan yang matang, audit forensik, atau negosiasi parameter dinamis lintas organisasi.
+
+Arah skripsi tetap pada perancangan framework backend FHE dan standar pemakaiannya, dengan bukti jalan berupa repositori \texttt{fhe-eval} (FastAPI, CKKS, klien tipis, dan penegakan standar). Pengembangan lanjutan dapat menambah operasi, menempatkan layanan di lingkungan \emph{cloud}, atau menghubungkan adapter ke pustaka/akselerasi lain tanpa mengubah kontrak aplikasi.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\appendix
+\chapter{STANDAR INTERAKSI APLIKASI DAN BACKEND}
+\label{app:standards}
+
+Lampiran ini merangkum kontrak interaksi yang diberlakukan pada prototipe \texttt{fhe-eval}. Versi lengkap dan yang terus diperbarui berada pada berkas \texttt{fhe-eval/STANDARDS.md} di repositori penelitian. Pengembang aplikasi yang memakai backend evaluasi wajib mematuhi aturan berikut.
+
+\section*{Pembagian peran}
+
+Klien aplikasi boleh menghasilkan kunci, mengenkripsi masukan, mengirim ciphertext, dan mendekripsi hasil. Klien tidak boleh mengirim secret key ke backend dan tidak boleh meminta dekripsi di server. Backend evaluasi boleh menyimpan public context, mengevaluasi ciphertext, dan mengembalikan ciphertext hasil. Backend tidak boleh menyimpan secret key klien dan tidak boleh mengembalikan plaintext hasil evaluasi.
+
+\section*{Profil konteks aktif}
+
+Profil yang dipakai prototipe memiliki \texttt{context\_id} \texttt{ckks-n8192-s40-d8-16}. Skema yang dipakai adalah CKKS. Derajat polinomial $N=8192$ dan skala global $2^{40}$. Dimensi vektor yang diizinkan adalah $8$ dan $16$. Operasi yang diizinkan adalah \texttt{add}, \texttt{mul\_plain}, dan \texttt{linear\_score}.
+
+\section*{Endpoint}
+
+\texttt{GET /v1/context} mengembalikan profil parameter publik, daftar operasi, dan status pengikatan context. \texttt{POST /v1/context/bind} mengikat public context (tanpa secret key) ke backend. \texttt{POST /v1/eval/add} menjumlahkan dua ciphertext vektor. \texttt{POST /v1/eval/mul\_plain} mengalikan ciphertext dengan vektor bobot plaintext. \texttt{POST /v1/eval/linear\_score} menghitung $y=\mathbf{w}^{\top}\mathbf{x}+b$ dengan $\mathbf{x}$ terenkripsi; pada prototipe ini $\mathbf{w}$ dan $b$ diperlakukan sebagai parameter model publik. \texttt{GET /v1/metrics/last} mengembalikan metrik evaluasi atau penolakan terakhir.
+
+\section*{Aturan penolakan}
+
+Permintaan yang melanggar kontrak ditolak dengan HTTP 400. Alasan penolakan yang ditegakkan meliputi kehadiran field \texttt{secret\_key}, ketidaksesuaian \texttt{context\_id}, dimensi di luar himpunan yang diizinkan, operasi di luar whitelist, ketidaksesuaian panjang bobot, serta kegagalan pengikatan context atau evaluasi. Tidak tersedia endpoint dekripsi pada backend. Seluruh keluaran evaluasi tetap berupa ciphertext yang dikodekan Base64.
+
+\section*{Alur pemakaian yang patuh}
+
+Pengembang aplikasi yang patuh standar menempuh urutan berikut: membaca profil lewat \texttt{GET /v1/context}; membuat context CKKS di klien dengan secret key yang tetap lokal; mengikat public context lewat \texttt{POST /v1/context/bind}; mengenkripsi masukan di klien; memanggil endpoint \texttt{/v1/eval/*}; mendekripsi hasil di klien; dan bila diperlukan membandingkan hasil dengan baseline plaintext. Target operasional galat relatif skoring linear pada profil ini adalah di bawah $10^{-3}$.
+
+\end{document}

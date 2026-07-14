@@ -1,0 +1,33 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+*.log
+.mypy_cache/
+fhe-eval/.venv/
+fhe-eval/.pytest_cache/
+
+# Large literature PDFs stay local; curated copies optional under refs/
+*.pdf
+!proposal.pdf
+!Proposal_Muhammad_Ulinnuha.pdf
+!daftar-link-jurnal.pdf
+!logo-ugm.png
+
+# Keep source PDFs out of git if duplicated at root
+1-s2.0-*.pdf
+Homomorphic_*.pdf
+Privacy_*.pdf
+TSP_*.pdf
+A-survey-*.pdf
+understanding-*.pdf
+a-privacy-*.pdf
+contoh-*.pdf
+jcp-*.pdf
+s1*.pdf
+telecom-*.pdf
+3748173*.pdf
+FHE_*.pdf
+Proposal___*.pdf
+
