@@ -1,6 +1,6 @@
-# Standar Interaksi Aplikasi ↔ Backend FHE
+# Standar Interaksi Aplikasi dan Backend HEBA
 
-Dokumen ini adalah kontrak akademik untuk prototipe `fhe-eval`. Pengembang aplikasi wajib mematuhinya. Backend menegakkan aturan pada setiap permintaan evaluasi.
+Dokumen ini adalah kontrak akademik untuk prototipe HEBA. Pengembang aplikasi wajib mematuhinya. Backend menegakkan aturan pada setiap permintaan evaluasi.
 
 ## Peran
 

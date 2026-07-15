@@ -12,7 +12,7 @@ from typing import Sequence
 
 import tenseal as ts
 
-from fhe_eval.config import PROFILE, CkksProfile
+from heba.config import PROFILE, CkksProfile
 
 
 class EngineError(ValueError):

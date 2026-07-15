@@ -11,8 +11,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fhe_eval.config import PROFILE
-from fhe_eval.engine import (
+from heba.config import PROFILE
+from heba.engine import (
     EvalEngine,
     b64encode,
     create_client_context,

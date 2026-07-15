@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""End-to-end demo: encrypted linear scoring via the FHE backend."""
+"""End-to-end demo: encrypted linear scoring via the HEBA backend."""
 
 from __future__ import annotations
 
@@ -14,11 +14,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "client"))
 
-from fhe_client import FheEvalClient, plaintext_linear_score  # noqa: E402
+from heba_client import HebaClient, plaintext_linear_score  # noqa: E402
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Demo linear_score against FHE backend")
+    parser = argparse.ArgumentParser(description="Demo linear_score against HEBA backend")
     parser.add_argument("--base-url", default="http://127.0.0.1:8000")
     parser.add_argument("--dim", type=int, choices=[8, 16], default=8)
     parser.add_argument("--seed", type=int, default=42)
@@ -29,7 +29,7 @@ def main() -> int:
     weights = rng.normal(0.0, 0.5, size=args.dim).tolist()
     bias = float(rng.normal(0.0, 0.1))
 
-    client = FheEvalClient(base_url=args.base_url)
+    client = HebaClient(base_url=args.base_url)
     info = client.get_context_info()
     print("context:", json.dumps(info, indent=2))
 

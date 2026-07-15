@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request
 
-from fhe_eval.config import PROFILE
-from fhe_eval.engine import EngineError, b64encode
-from fhe_eval.metrics import EvalMetrics, Timer
-from fhe_eval.schemas import (
+from heba.config import PROFILE
+from heba.engine import EngineError, b64encode
+from heba.metrics import EvalMetrics, Timer
+from heba.schemas import (
     AddRequest,
     BindContextRequest,
     BindContextResponse,
@@ -17,7 +17,7 @@ from fhe_eval.schemas import (
     MetricsResponse,
     MulPlainRequest,
 )
-from fhe_eval.standards import StandardsViolation, validate_eval_request
+from heba.standards import StandardsViolation, validate_eval_request
 
 router = APIRouter()
 

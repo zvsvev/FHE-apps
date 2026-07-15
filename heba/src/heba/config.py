@@ -16,7 +16,7 @@ class CkksProfile:
     global_scale: float = 2**40
     allowed_dims: tuple[int, ...] = (8, 16)
     allowed_ops: tuple[str, ...] = ("add", "mul_plain", "linear_score")
-    engine_name: str = "tenseal-ckks"
+    engine_name: str = "heba-tenseal-ckks"
     security_note: str = (
         "Prototype profile for academic evaluation; not a formal security certification."
     )

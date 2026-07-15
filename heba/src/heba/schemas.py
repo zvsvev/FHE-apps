@@ -6,7 +6,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
-from fhe_eval.config import PROFILE
+from heba.config import PROFILE
 
 
 class ContextInfo(BaseModel):

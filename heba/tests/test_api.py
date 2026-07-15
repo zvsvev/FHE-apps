@@ -12,9 +12,9 @@ from fastapi.testclient import TestClient
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fhe_eval.api.app import create_app
-from fhe_eval.config import PROFILE
-from fhe_eval.engine import (
+from heba.api.app import create_app
+from heba.config import PROFILE
+from heba.engine import (
     b64encode,
     create_client_context,
     decrypt_scalar,
@@ -92,7 +92,7 @@ def test_add_endpoint(api):
         },
     )
     assert resp.status_code == 200, resp.text
-    from fhe_eval.engine import b64decode
+    from heba.engine import b64decode
 
     dec = decrypt_vector(ctx, b64decode(resp.json()["result_ciphertext_b64"]))
     assert np.allclose(dec, np.array(left) + np.array(right), atol=1e-3)

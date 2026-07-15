@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 
-from fhe_eval import __version__
-from fhe_eval.api.routes import router
-from fhe_eval.engine import EvalEngine
-from fhe_eval.metrics import METRICS
+from heba import __version__
+from heba.api.routes import router
+from heba.engine import EvalEngine
+from heba.metrics import METRICS
 
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="FHE Evaluation Backend",
+        title="HEBA Backend",
         description=(
             "Backend layanan evaluasi Fully Homomorphic Encryption (CKKS/TenSEAL) "
             "dengan standar interaksi untuk pengembang aplikasi."

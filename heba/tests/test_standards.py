@@ -11,8 +11,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fhe_eval.config import PROFILE
-from fhe_eval.standards import StandardsViolation, validate_eval_request
+from heba.config import PROFILE
+from heba.standards import StandardsViolation, validate_eval_request
 
 
 def test_accepts_valid_request():

@@ -13,6 +13,9 @@
 \usepackage{array}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{caption}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,calc}
 
 \onehalfspacing
 \setlength{\parindent}{1.25cm}
@@ -133,7 +136,7 @@ Meskipun demikian, pembahasan tersebut sering berhenti pada skema kriptografi, k
 
 Penelitian ini mengusulkan perancangan framework lapisan backend FHE beserta standar pengembangan aplikasi yang menyertainya. Framework yang dimaksud adalah rancangan arsitektur layanan di sisi sistem: konfigurasi parameter, layanan evaluasi pada ciphertext, pengelolaan kunci menurut peran, antarmuka layanan, dan pencatatan metrik. Standar yang dimaksud adalah aturan yang wajib diikuti aplikasi ketika memakai backend tersebut, meliputi format permintaan, batasan operasi, larangan mengirim kunci privat ke server evaluasi, dan kewajiban menerima hasil tetap dalam bentuk terenkripsi. Dengan pemisahan ini, pengembang aplikasi diharapkan dapat fokus pada logika aplikasi, sementara kompleksitas FHE dipusatkan di kerangka backend.
 
-Sebagai wujud yang dapat diuji, penelitian akan membangun prototipe konkret bernama layanan evaluasi FHE. Stack yang dipakai adalah pustaka OpenFHE dengan skema CKKS sebagai mesin kriptografi \cite{badawi2022openfhe,brynds2025cryptoracle}, antarmuka REST berbasis FastAPI di Python sebagai pintu masuk backend, serta klien Python tipis yang hanya mengenkripsi masukan, memanggil API, dan mendekripsi keluaran. Beban kerja yang dijalankan bukan fungsi sembarang, melainkan skoring linear terenkripsi $y=\mathbf{w}^{\top}\mathbf{x}+b$ pada vektor fitur berdimensi tetap, dilengkapi operasi penjumlahan dan perkalian skalar sebagai unit verifikasi alur.
+Sebagai wujud yang dapat diuji, penelitian membangun prototipe bernama \textbf{HEBA} (\emph{Homomorphic Encryption Backend Architecture}). HEBA adalah kerangka backend evaluasi FHE beserta standar interaksi bagi pengembang aplikasi. Stack yang dipakai pada implementasi awal adalah skema CKKS melalui TenSEAL di balik antarmuka REST FastAPI, dengan jalur pengembangan adapter OpenFHE di kemudian hari \cite{benaissa2021tenseal,badawi2022openfhe,brynds2025cryptoracle}. Klien Python tipis hanya mengenkripsi masukan, memanggil API, dan mendekripsi keluaran. Beban kerja utama adalah skoring linear terenkripsi $y=\mathbf{w}^{\top}\mathbf{x}+b$ pada vektor fitur berdimensi tetap, dilengkapi penjumlahan dan perkalian skalar sebagai unit verifikasi alur.
 
 \section{Rumusan Masalah}
 
@@ -147,7 +150,7 @@ Stack implementasi dipatok pada OpenFHE dengan skema CKKS, layanan HTTP REST men
 
 \section{Tujuan Penelitian}
 
-Penelitian ini bertujuan merancang framework lapisan backend FHE yang menempatkan konfigurasi skema, evaluasi homomorfik, pengelolaan kunci menurut peran, dan antarmuka layanan di dalam kerangka sistem. Penelitian ini juga bertujuan merumuskan standar pengembangan aplikasi yang mengatur cara aplikasi berinteraksi dengan backend tersebut, mencakup format permintaan REST, batasan operasi, aturan penanganan kunci, dan kewajiban menjaga data tetap terenkripsi selama berada di server evaluasi. Tujuan implementatifnya adalah membangun prototipe layanan evaluasi berbasis OpenFHE--CKKS yang diekspos melalui FastAPI, dilengkapi klien tipis dan skenario skoring linear terenkripsi, lalu mengukur kebenaran hasil serta biaya dasar eksekusi.
+Penelitian ini bertujuan merancang framework lapisan backend FHE yang menempatkan konfigurasi skema, evaluasi homomorfik, pengelolaan kunci menurut peran, dan antarmuka layanan di dalam kerangka sistem. Penelitian ini juga bertujuan merumuskan standar pengembangan aplikasi yang mengatur cara aplikasi berinteraksi dengan backend tersebut, mencakup format permintaan REST, batasan operasi, aturan penanganan kunci, dan kewajiban menjaga data tetap terenkripsi selama berada di server evaluasi. Tujuan implementatifnya adalah membangun prototipe HEBA (backend CKKS berbasis FastAPI, klien tipis, dan penegakan standar), menjalankan skenario skoring linear terenkripsi, lalu mengukur kebenaran hasil serta biaya dasar eksekusi.
 
 \section{Sistematika Penulisan}
 
@@ -164,7 +167,7 @@ Dalam penulisan laporan ini, susunan pembahasan mengikuti sistematika berikut:
   Pada bagian ini dijelaskan tahapan penelitian, rancangan framework backend, perumusan standar interaksi aplikasi, skenario pengujian, metrik evaluasi, dan metode analisis.
 
   \item \textbf{RENCANA PENELITIAN}\\
-  Bagian akhir proposal menjelaskan prototipe \texttt{fhe-eval}, status implementasi, alur kerja, bentuk hasil yang akan dianalisis, keterbatasan, serta arah pengembangan. Lampiran A merangkum standar interaksi aplikasi--backend.
+  Bagian akhir proposal menjelaskan prototipe HEBA, diagram arsitektur dan alur evaluasi, status implementasi, bentuk hasil, keterbatasan, serta arah pengembangan. Lampiran A merangkum standar interaksi aplikasi--backend.
 \end{enumerate}
 
 \chapter{TINJAUAN PUSTAKA}
@@ -223,7 +226,7 @@ Prototipe yang dibangun memiliki sasaran yang tegas: sebuah layanan evaluasi FHE
 
 Mesin kriptografi memakai OpenFHE pada skema CKKS. OpenFHE dipilih karena menyediakan API terpadu untuk skema-skema FHE utama, mendukung mode pengelolaan parameter yang terpusat, dan telah dikarakterisasi secara mendalam untuk workload CKKS \cite{badawi2022openfhe,brynds2025cryptoracle}. CKKS dipilih karena sesuai untuk vektor numerik aproksimasi pada skoring linear dan sejalan dengan penggunaan skema numerik pada studi alur \emph{secure-by-design} maupun survei PPML \cite{vinko2026secureByDesign,wu2025ckksSurvey}. Lapisan layanan memakai FastAPI pada Python untuk mengekspos endpoint REST, mem-parse permintaan, memanggil wrapper OpenFHE di proses backend, dan mengembalikan respons JSON. Serialisasi ciphertext memakai format biner bawaan OpenFHE yang dikodekan Base64 di dalam body JSON agar dapat melewati HTTP tanpa mengorbankan struktur ciphertext. Klien contoh ditulis dalam Python: menghasilkan kunci, mengenkripsi vektor fitur, mengirim permintaan, menerima ciphertext hasil, dan mendekripsi. Sebagai rujukan ekosistem Python terkait, TenSEAL menunjukkan pola operasi tensor terenkripsi di atas mesin HE, tetapi dalam penelitian ini TenSEAL tidak menjadi backend utama; yang dipakai adalah OpenFHE yang dibungkus layanan \cite{benaissa2021tenseal}.
 
-Artefak yang akan dihasilkan terdiri atas empat bagian. Pertama, repositori layanan backend (\texttt{fhe-eval-backend}) yang memuat inisialisasi \emph{crypto context} CKKS, whitelist operasi, endpoint REST, dan pencatat metrik. Kedua, klien tipis (\texttt{fhe-eval-client}) yang mematuhi standar pemanggilan. Ketiga, dokumen standar interaksi yang merinci skema payload, kode operasi, dan aturan kunci. Keempat, skrip uji yang menjalankan baseline plaintext, alur terenkripsi, dan kasus penolakan.
+Artefak yang dihasilkan terwadahi dalam repositori prototipe HEBA. Isinya mencakup layanan backend (inisialisasi konteks CKKS, whitelist operasi, endpoint REST, pencatat metrik), klien tipis yang mematuhi standar, dokumen standar interaksi, serta skrip uji untuk baseline plaintext, alur terenkripsi, dan kasus penolakan.
 
 Konfigurasi CKKS pada prototipe direncanakan dengan tingkat keamanan sekitar 128 bit, derajat polinomial $N=2^{13}$ atau $N=2^{14}$ (dipilih setelah uji kelayakan memori pada mesin pengembangan), dan kedalaman multiplikasi yang cukup untuk satu putaran perkalian elemen-wise diikuti penjumlahan, tanpa bootstrapping. Parameter final akan dicatat apa adanya pada laporan agar eksperimen dapat diulang.
 
@@ -257,49 +260,164 @@ Analisis kebenaran membandingkan $y$ hasil dekripsi terhadap baseline plaintext 
 
 \chapter{RENCANA PENELITIAN}
 
-\section{Prototipe \texttt{fhe-eval}}
+\section{Prototipe HEBA}
 
-Bukti rancangan diwujudkan sebagai repositori prototipe bernama \texttt{fhe-eval} yang berada dalam folder kerja penelitian. Prototipe ini bukan sekadar kerangka kosong: di dalamnya terdapat layanan evaluasi FHE, klien tipis, penegakan standar, skrip demo, dan rangkaian uji otomatis. Struktur utamanya adalah sebagai berikut.
+Bukti rancangan diwujudkan sebagai prototipe \textbf{HEBA} (\emph{Homomorphic Encryption Backend Architecture}). HEBA menempatkan evaluasi FHE pada lapisan backend, mengekspos kontrak REST yang terstandar, dan membebaskan pengembang aplikasi dari penyusunan infrastruktur kriptografi. Repositori prototipe berada pada folder \texttt{heba/} dalam folder kerja penelitian. Di dalamnya terdapat layanan evaluasi, klien tipis, penegakan standar, skrip demo, dan rangkaian uji otomatis.
 
-\begin{itemize}
-  \item \texttt{src/fhe\_eval/}: inti backend, meliputi profil parameter CKKS (\texttt{config.py}), mesin evaluasi (\texttt{engine.py}), penegakan standar (\texttt{standards.py}), model permintaan/respons (\texttt{schemas.py}), pencatat metrik (\texttt{metrics.py}), dan antarmuka FastAPI (\texttt{api/}).
-  \item \texttt{client/}: klien Python tipis (\texttt{fhe\_client.py}) dan demo skoring linear (\texttt{demo\_linear\_score.py}).
-  \item \texttt{tests/}: uji unit mesin FHE, uji API, dan uji penolakan standar.
-  \item \texttt{STANDARDS.md}: kontrak interaksi aplikasi--backend yang diringkas juga pada Lampiran A proposal ini.
-  \item \texttt{README.md} dan \texttt{requirements.txt}: petunjuk instalasi dan dependensi.
-\end{itemize}
+Struktur perangkat lunak HEBA disusun sebagai berikut. Paket \texttt{src/heba/} memuat inti backend: profil parameter CKKS, mesin evaluasi, penegakan standar, skema payload, pencatat metrik, dan antarmuka FastAPI. Folder \texttt{client/} memuat klien Python tipis dan demo skoring linear. Folder \texttt{tests/} memuat uji mesin FHE, uji API, dan uji penolakan standar. Berkas \texttt{STANDARDS.md} memuat kontrak interaksi yang diringkas pada Lampiran A.
 
-Stack yang berjalan pada prototipe saat ini memakai skema CKKS melalui pustaka TenSEAL (Microsoft SEAL) di balik layanan FastAPI \cite{benaissa2021tenseal,vinko2026secureByDesign}. Pilihan ini diambil agar mesin kriptografi dapat diinstal dan diuji pada lingkungan pengembangan, sementara kontrak REST tetap selaras dengan rancangan backend. Adapter evaluasi dipisahkan di \texttt{engine.py} agar di kemudian hari dapat diganti ke OpenFHE tanpa mengubah endpoint yang dilihat pengembang aplikasi \cite{badawi2022openfhe,brynds2025cryptoracle}. Profil parameter aktif prototipe diberi pengenal \texttt{ckks-n8192-s40-d8-16} (derajat polinomial $8192$, skala $2^{40}$, dimensi vektor $8$ dan $16$).
+Stack yang berjalan saat ini memakai skema CKKS melalui TenSEAL (Microsoft SEAL) di balik layanan FastAPI \cite{benaissa2021tenseal,vinko2026secureByDesign}. Adapter evaluasi dipisahkan agar di kemudian hari dapat diganti ke OpenFHE tanpa mengubah endpoint yang dilihat pengembang aplikasi \cite{badawi2022openfhe,brynds2025cryptoracle}. Profil parameter aktif HEBA diberi pengenal \texttt{ckks-n8192-s40-d8-16} (derajat polinomial $8192$, skala $2^{40}$, dimensi vektor $8$ dan $16$).
+
+Arsitektur HEBA digambarkan pada Gambar~\ref{fig:heba-arsitektur}. Sisi klien memegang secret key serta tugas enkripsi dan dekripsi. Sisi backend HEBA menerima public context, menegakkan standar, menjalankan evaluasi pada ciphertext, dan mengembalikan ciphertext hasil. Tidak ada jalur dekripsi di server evaluasi.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\small\sffamily,
+  >=Stealth,
+  box/.style={
+    draw=black!75,
+    rounded corners=2pt,
+    align=center,
+    inner sep=6pt,
+    minimum height=1.05cm,
+    fill=black!3
+  },
+  role/.style={
+    draw=black!70,
+    thick,
+    rounded corners=3pt,
+    inner sep=8pt,
+    fill=black!2
+  },
+  arr/.style={->, thick, black!70},
+  note/.style={font=\footnotesize\sffamily, align=center, text=black!70}
+]
+  % Client side
+  \node[role, minimum width=5.6cm, minimum height=5.4cm] (clientframe) at (0,0) {};
+  \node[font=\bfseries, anchor=north] at (clientframe.north) {Klien aplikasi};
+  \node[box, minimum width=4.6cm] (logic) at (0,1.55) {Logika bisnis\\pengembang aplikasi};
+  \node[box, minimum width=4.6cm] (keys) at (0,0.25) {Secret key + public key\\(lokal di klien)};
+  \node[box, minimum width=4.6cm] (crypt) at (0,-1.05) {Enkripsi masukan\\Dekripsi hasil};
+  \node[box, minimum width=4.6cm] (thin) at (0,-2.3) {Klien tipis HEBA\\(HTTP + serialisasi)};
+
+  \draw[arr] (logic) -- (keys);
+  \draw[arr] (keys) -- (crypt);
+  \draw[arr] (crypt) -- (thin);
+
+  % Backend side
+  \node[role, minimum width=6.4cm, minimum height=5.4cm] (backframe) at (8.2,0) {};
+  \node[font=\bfseries, anchor=north] at (backframe.north) {Backend HEBA};
+  \node[box, minimum width=5.4cm] (api) at (8.2,1.55) {Antarmuka REST (FastAPI)\\standar payload};
+  \node[box, minimum width=5.4cm] (std) at (8.2,0.25) {Validator standar\\whitelist operasi};
+  \node[box, minimum width=5.4cm] (eng) at (8.2,-1.05) {Mesin evaluasi CKKS\\(TenSEAL / adapter FHE)};
+  \node[box, minimum width=5.4cm] (met) at (8.2,-2.3) {Public context + metrik\\(tanpa secret key)};
+
+  \draw[arr] (api) -- (std);
+  \draw[arr] (std) -- (eng);
+  \draw[arr] (eng) -- (met);
+
+  % Between
+  \draw[arr, bend left=8] (thin.east) to node[above, note, pos=0.5] {ciphertext +\\permintaan evaluasi} (api.west);
+  \draw[arr, bend left=8] (api.west) to node[below, note, pos=0.5] {ciphertext hasil\\(tanpa plaintext)} (thin.east);
+
+  \node[note, anchor=north] at ($(clientframe.south)!0.5!(backframe.south)+(0,-0.55)$)
+    {Secret key tidak pernah dikirim ke backend. Dekripsi hanya di klien.};
+\end{tikzpicture}%
+}
+\caption{Arsitektur prototipe HEBA: pemisahan klien aplikasi dan backend evaluasi FHE.}
+\label{fig:heba-arsitektur}
+\end{figure}
 
 \section{Rencana Implementasi dan Status}
 
-Implementasi disusun dalam tonggak yang dapat diperiksa, dan sebagian telah terisi oleh prototipe \texttt{fhe-eval}.
+Implementasi disusun dalam tonggak yang dapat diperiksa, dan sebagian telah terisi oleh prototipe HEBA.
 
-Tonggak pertama adalah mesin evaluasi CKKS yang mampu membuat konteks, menghasilkan kunci di sisi klien, mengenkripsi vektor, menjalankan penjumlahan, perkalian dengan bobot plaintext, skoring linear, serta men-serialisasi ciphertext. Pada \texttt{fhe-eval}, tonggak ini diwujudkan di \texttt{engine.py} dan diverifikasi oleh \texttt{tests/test\_engine.py}.
+Tonggak pertama adalah mesin evaluasi CKKS yang mampu membuat konteks, menghasilkan kunci di sisi klien, mengenkripsi vektor, menjalankan penjumlahan, perkalian dengan bobot plaintext, skoring linear, serta men-serialisasi ciphertext. Pada HEBA, tonggak ini diwujudkan di \texttt{engine.py} dan diverifikasi oleh \texttt{tests/test\_engine.py}.
 
 Tonggak kedua adalah layanan FastAPI dengan endpoint konteks, pengikatan public context, evaluasi, dan metrik, dilengkapi validator standar. Endpoint yang disediakan meliputi \texttt{GET /v1/context}, \texttt{POST /v1/context/bind}, \texttt{POST /v1/eval/add}, \texttt{POST /v1/eval/mul\_plain}, \texttt{POST /v1/eval/linear\_score}, dan \texttt{GET /v1/metrics/last}. Uji API tersedia di \texttt{tests/test\_api.py}.
 
 Tonggak ketiga adalah klien tipis dan skrip demo untuk skoring linear pada $d=8$ dan $d=16$, dengan pembandingan terhadap baseline plaintext. Target operasional galat relatif di bawah $10^{-3}$ dipakai sebagai ambang awal kelayakan numerik CKKS.
 
-Tonggak keempat adalah dokumentasi standar interaksi. Isi kontrak ditulis di \texttt{fhe-eval/STANDARDS.md} dan diringkas pada Lampiran A. Pengujian penegakan standar (penolakan secret key, operasi ilegal, dan sejenisnya) ada di \texttt{tests/test\_standards.py} serta skenario negatif API.
+Tonggak keempat adalah dokumentasi standar interaksi. Isi kontrak ditulis di \texttt{heba/STANDARDS.md} dan diringkas pada Lampiran A. Pengujian penegakan standar (penolakan secret key, operasi ilegal, dan sejenisnya) ada di \texttt{tests/test\_standards.py} serta skenario negatif API.
 
 Pekerjaan lanjutan skripsi mencakup perluasan himpunan operasi, pengaitan adapter OpenFHE apabila lingkungan build sudah siap, penempatan layanan pada skenario \emph{cloud} yang lebih realistis, serta pelaporan metrik yang lebih sistematis pada bab hasil.
 
 \section{Komponen dan Alur Kerja Prototipe}
 
-Komponen yang dijalankan pada \texttt{fhe-eval} mencerminkan pemisahan peran. Klien memiliki secret key, mengenkripsi masukan, dan mendekripsi keluaran. Backend hanya menyimpan public context setelah \texttt{/v1/context/bind}, menolak payload yang melanggar standar, menjalankan evaluasi pada ciphertext, dan mengembalikan ciphertext hasil. Backend tidak menyediakan endpoint dekripsi.
+Komponen yang dijalankan pada HEBA mencerminkan pemisahan peran. Klien memiliki secret key, mengenkripsi masukan, dan mendekripsi keluaran. Backend hanya menyimpan public context setelah \texttt{/v1/context/bind}, menolak payload yang melanggar standar, menjalankan evaluasi pada ciphertext, dan mengembalikan ciphertext hasil. Backend tidak menyediakan endpoint dekripsi.
 
-Alur skoring linear berjalan sebagai berikut. Klien memanggil \texttt{GET /v1/context} untuk memastikan profil parameter. Klien membuat context CKKS lokal, lalu mengirim public context (tanpa secret key) melalui \texttt{POST /v1/context/bind}. Klien mengenkripsi vektor fitur $\mathbf{x}$ dan mengirim \texttt{POST /v1/eval/linear\_score} bersama bobot $\mathbf{w}$, bias $b$, dimensi $d$, dan \texttt{context\_id}. Backend memvalidasi permintaan, menghitung $y=\mathbf{w}^{\top}\mathbf{x}+b$ secara homomorfik, dan mengembalikan ciphertext $y$. Klien mendekripsi $y$ dan membandingkannya dengan baseline plaintext. Sepanjang evaluasi di server, plaintext $\mathbf{x}$ tidak direkonstruksi.
+Alur skoring linear digambarkan pada Gambar~\ref{fig:heba-alur}. Klien memanggil \texttt{GET /v1/context} untuk memastikan profil parameter, membuat context CKKS lokal, lalu mengirim public context melalui \texttt{POST /v1/context/bind}. Klien mengenkripsi vektor fitur $\mathbf{x}$ dan mengirim \texttt{POST /v1/eval/linear\_score} bersama bobot $\mathbf{w}$, bias $b$, dimensi $d$, dan \texttt{context\_id}. Backend memvalidasi permintaan, menghitung $y=\mathbf{w}^{\top}\mathbf{x}+b$ secara homomorfik, dan mengembalikan ciphertext $y$. Klien mendekripsi $y$ dan membandingkannya dengan baseline plaintext. Sepanjang evaluasi di server, plaintext $\mathbf{x}$ tidak direkonstruksi.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  >=Stealth,
+  actor/.style={
+    draw=black!75,
+    rounded corners=2pt,
+    minimum width=2.5cm,
+    minimum height=0.75cm,
+    align=center,
+    fill=black!3,
+    font=\small\sffamily\bfseries
+  },
+  msg/.style={->, thick, black!75},
+  note/.style={font=\scriptsize\sffamily, text=black!65}
+]
+  \node[actor] (C) at (0,0) {Klien HEBA};
+  \node[actor] (S) at (9.2,0) {Backend HEBA};
+
+  \draw[thick, black!40] (C.south) -- ++(0,-7.4);
+  \draw[thick, black!40] (S.south) -- ++(0,-7.4);
+
+  \coordinate (c0) at (0,-0.9);
+  \coordinate (s0) at (9.2,-0.9);
+  \draw[msg] (c0) -- node[above, note] {\texttt{GET /v1/context}} (s0);
+  \draw[msg] ([yshift=-0.35cm]s0) -- node[above, note] {profil parameter + daftar operasi} ([yshift=-0.35cm]c0);
+
+  \coordinate (c1) at (0,-1.9);
+  \node[note, anchor=west] at (0.2,-1.9) {buat context CKKS; secret key tetap di klien};
+
+  \coordinate (c2) at (0,-2.6);
+  \coordinate (s2) at (9.2,-2.6);
+  \draw[msg] (c2) -- node[above, note] {\texttt{POST /v1/context/bind} (public context)} (s2);
+  \draw[msg] ([yshift=-0.35cm]s2) -- node[above, note] {context terikat / penolakan} ([yshift=-0.35cm]c2);
+
+  \coordinate (c3) at (0,-3.7);
+  \node[note, anchor=west] at (0.2,-3.7) {enkripsi $\mathbf{x}$ $\rightarrow$ ciphertext};
+
+  \coordinate (c4) at (0,-4.4);
+  \coordinate (s4) at (9.2,-4.4);
+  \draw[msg] (c4) -- node[above, note] {\texttt{POST /v1/eval/linear\_score} ($ct(\mathbf{x}),\mathbf{w},b$)} (s4);
+
+  \coordinate (s5) at (9.2,-5.2);
+  \node[note, anchor=east] at (9.0,-5.2) {validasi standar + evaluasi CKKS};
+
+  \coordinate (c6) at (0,-5.9);
+  \coordinate (s6) at (9.2,-5.9);
+  \draw[msg] (s6) -- node[above, note] {ciphertext $ct(y)$; $y=\mathbf{w}^{\top}\mathbf{x}+b$} (c6);
+
+  \coordinate (c7) at (0,-6.7);
+  \node[note, anchor=west] at (0.2,-6.7) {dekripsi $ct(y)$; bandingkan baseline plaintext};
+\end{tikzpicture}%
+}
+\caption{Alur evaluasi skoring linear pada HEBA.}
+\label{fig:heba-alur}
+\end{figure}
 
 \section{Rencana Hasil dan Pembahasan}
 
-Hasil yang disajikan meliputi uraian arsitektur \texttt{fhe-eval}, spesifikasi endpoint dan payload, ringkasan kontrak pada Lampiran A, tabel galat skoring linear, tabel latensi evaluasi, serta rekap penolakan standar. Pembahasan menilai apakah pemisahan tanggung jawab tercapai: pengembang yang memakai klien tipis tidak menulis konfigurasi mesin FHE di server aplikasi, sementara backend menegakkan whitelist dan menjaga ciphertext tetap tertutup. Angka latensi dan ukuran ciphertext dibaca sebagai biaya layanan pada stack yang dipilih, lalu dikaitkan dengan temuan karakterisasi CKKS dan overhead FHE di literatur \cite{brynds2025cryptoracle,fan2026gpuFhe,li2026bootstrappingSurvey,lee2025clusterFhe}.
+Hasil yang disajikan meliputi uraian arsitektur HEBA, spesifikasi endpoint dan payload, ringkasan kontrak pada Lampiran A, tabel galat skoring linear, tabel latensi evaluasi, serta rekap penolakan standar. Pembahasan menilai apakah pemisahan tanggung jawab tercapai: pengembang yang memakai klien tipis tidak menulis konfigurasi mesin FHE di server aplikasi, sementara backend menegakkan whitelist dan menjaga ciphertext tetap tertutup. Angka latensi dan ukuran ciphertext dibaca sebagai biaya layanan pada stack yang dipilih, lalu dikaitkan dengan temuan karakterisasi CKKS dan overhead FHE di literatur \cite{brynds2025cryptoracle,fan2026gpuFhe,li2026bootstrappingSurvey,lee2025clusterFhe}.
 
 \section{Keterbatasan dan Arah Pengembangan}
 
-Prototipe \texttt{fhe-eval} dibatasi pada skema CKKS, himpunan operasi kecil, dan skoring linear berdimensi rendah tanpa bootstrapping. Mesin yang terpasang saat ini adalah TenSEAL; integrasi OpenFHE sebagai adapter alternatif masih menjadi pekerjaan lanjutan. Hasil tidak digeneralisasi ke jaringan dalam, operasi perbandingan, atau multi-tenant produksi. Standar masih berupa kontrak akademik REST, belum mencakup autentikasi layanan yang matang, audit forensik, atau negosiasi parameter dinamis lintas organisasi.
+Prototipe HEBA dibatasi pada skema CKKS, himpunan operasi kecil, dan skoring linear berdimensi rendah tanpa bootstrapping. Mesin yang terpasang saat ini adalah TenSEAL; integrasi OpenFHE sebagai adapter alternatif masih menjadi pekerjaan lanjutan. Hasil tidak digeneralisasi ke jaringan dalam, operasi perbandingan, atau multi-tenant produksi. Standar masih berupa kontrak akademik REST, belum mencakup autentikasi layanan yang matang, audit forensik, atau negosiasi parameter dinamis lintas organisasi.
 
-Arah skripsi tetap pada perancangan framework backend FHE dan standar pemakaiannya, dengan bukti jalan berupa repositori \texttt{fhe-eval} (FastAPI, CKKS, klien tipis, dan penegakan standar). Pengembangan lanjutan dapat menambah operasi, menempatkan layanan di lingkungan \emph{cloud}, atau menghubungkan adapter ke pustaka/akselerasi lain tanpa mengubah kontrak aplikasi.
+Arah skripsi tetap pada perancangan framework backend FHE dan standar pemakaiannya, dengan bukti jalan berupa prototipe HEBA (FastAPI, CKKS, klien tipis, dan penegakan standar). Pengembangan lanjutan dapat menambah operasi, menempatkan layanan di lingkungan \emph{cloud}, atau menghubungkan adapter ke pustaka/akselerasi lain tanpa mengubah kontrak aplikasi.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
@@ -308,7 +426,7 @@ Arah skripsi tetap pada perancangan framework backend FHE dan standar pemakaiann
 \chapter{STANDAR INTERAKSI APLIKASI DAN BACKEND}
 \label{app:standards}
 
-Lampiran ini merangkum kontrak interaksi yang diberlakukan pada prototipe \texttt{fhe-eval}. Versi lengkap dan yang terus diperbarui berada pada berkas \texttt{fhe-eval/STANDARDS.md} di repositori penelitian. Pengembang aplikasi yang memakai backend evaluasi wajib mematuhi aturan berikut.
+Lampiran ini merangkum kontrak interaksi yang diberlakukan pada prototipe HEBA. Versi lengkap dan yang terus diperbarui berada pada berkas \texttt{heba/STANDARDS.md} di repositori penelitian. Pengembang aplikasi yang memakai backend evaluasi wajib mematuhi aturan berikut.
 
 \section*{Pembagian peran}
 

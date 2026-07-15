@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Sequence
 
-from fhe_eval.config import PROFILE
+from heba.config import PROFILE
 
 
 class StandardsViolation(ValueError):

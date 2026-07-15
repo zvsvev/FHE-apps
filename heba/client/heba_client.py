@@ -17,8 +17,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fhe_eval.config import PROFILE  # noqa: E402
-from fhe_eval.engine import (  # noqa: E402
+from heba.config import PROFILE  # noqa: E402
+from heba.engine import (  # noqa: E402
     b64encode,
     create_client_context,
     decrypt_scalar,
@@ -28,7 +28,7 @@ from fhe_eval.engine import (  # noqa: E402
 )
 
 
-class FheEvalClient:
+class HebaClient:
     def __init__(self, base_url: str = "http://127.0.0.1:8000", timeout: float = 60.0) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
@@ -56,12 +56,12 @@ class FheEvalClient:
         return b64encode(encrypt_vector(self.context, values))
 
     def decrypt_vector(self, ciphertext_b64: str) -> list[float]:
-        from fhe_eval.engine import b64decode
+        from heba.engine import b64decode
 
         return decrypt_vector(self.context, b64decode(ciphertext_b64))
 
     def decrypt_scalar(self, ciphertext_b64: str) -> float:
-        from fhe_eval.engine import b64decode
+        from heba.engine import b64decode
 
         return decrypt_scalar(self.context, b64decode(ciphertext_b64))
 
